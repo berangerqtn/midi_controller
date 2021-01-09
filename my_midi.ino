@@ -64,7 +64,7 @@ void setup()
   {
     pinMode(j,OUTPUT);
   }
-  Serial.begin(57600); //57250 FOR MIDI TRANSMITTING AND 9250 FOR SERIAL TESTS
+  Serial.begin(31250); //31250 FOR MIDI TRANSMITTING AND 9250 FOR SERIAL TESTS
   digitalWrite(DLED1,HIGH);
 }
 
@@ -76,7 +76,7 @@ void loop()
 {  
   MANAGE_MODE();
   MANAGE_DIGITALS();
-  MANAGE_ANALOGS();
+  // MANAGE_ANALOGS();
   //Serial.print("\n\nMode actuel : ");
   //Serial.print(mode);
 }
@@ -92,71 +92,58 @@ void MIDI_TX(unsigned char MESSAGE, unsigned char DONNEE1, unsigned char DONNEE2
 }
 
 
-
-
 //FUNCTION : MANAGE_DIGITALS : Manage behaviour of digital Rising edge
 void MANAGE_DIGITALS()
 {
   if (digitalRead(D0)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 0 Activé!\n");
-    Serial.print(mode);
-    MIDI_TX(176,60+10*mode,127);
+    MIDI_TX(176,0+10*mode,127);
     delay(250);  
   }
     
   else if (digitalRead(D1)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 1 Activé!\n");
-    MIDI_TX(176,61+10*mode,127);
+    MIDI_TX(176,1+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D2)== LOW)                                          
   {
-    Serial.print("\nPIN 2 Activé!\n");
-    MIDI_TX(176,62+10*mode,127);
+    MIDI_TX(176,2+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D3)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 3 Activé!\n");
-    MIDI_TX(176,63+10*mode,127);
+    MIDI_TX(176,3+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D4)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 4 Activé!\n");
-    MIDI_TX(176,64+10*mode,127);
+    MIDI_TX(176,4+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D5)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 5 Activé!\n");
-    MIDI_TX(176,65+10*mode,127);
+    MIDI_TX(176,5+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D6)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 6 Activé!\n");
-    MIDI_TX(176,66+10*mode,127);
+    MIDI_TX(176,6+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D7)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 7 Activé!\n");
-    MIDI_TX(176,67+10*mode,127);
+    MIDI_TX(176,7+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D8)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 8 Activé!\n");
-    MIDI_TX(176,68+10*mode,127);
+    MIDI_TX(176,8+10*mode,127);
     delay(250);  
   }
   else if (digitalRead(D9)== LOW)                                                                                               
   {
-    Serial.print("\nPIN 9 Activé!\n");
-    MIDI_TX(176,69+10*mode,127);
+    MIDI_TX(176,9+10*mode,127);
     delay(250);  
   }
 }
@@ -164,24 +151,20 @@ void MANAGE_MODE()
 {
   if (digitalRead(D10)==HIGH)
   {
-    Serial.print("\nPIN10 activé, Changement de programme");
     if (mode==0)
     {
-      Serial.print("\nOn passe au mode 2 ");
       digitalWrite(DLED1,LOW);
       digitalWrite(DLED2,HIGH);
       delay(250);
     }
     if (mode==1)
     {
-      Serial.print("\nOn passe au mode 3 ");
       digitalWrite(DLED2,LOW);
       digitalWrite(DLED3,HIGH);
       delay(250);
     }
     else if (mode==2)
     {
-      Serial.print("\nOn passe au mode 1 ");
       digitalWrite(DLED3,LOW);
       digitalWrite(DLED1, HIGH);
       delay(250);
@@ -190,20 +173,49 @@ void MANAGE_MODE()
     mode=mode%3;
   }
 }
-int temp =0;
+int temp0=0;
+int temp1=0;
+int temp2=0;
+int temp3=0;
+int temp4=0;
+int temp5=0;
+
 void MANAGE_ANALOGS()
 {
-  //Serial.print(analogRead(An0));
-  //Serial.print("\n");
   if (!(An0_Val-4<analogRead(An0)) || !(analogRead(An0)<An0_Val +4))
   {
     An0_Val=analogRead(An0); 
-    temp=int((An0_Val*127)/1023);
-    MIDI_TX(176,41+6*mode,temp);
-        
-    Serial.print("\nChangement de Valeur : ");
-    Serial.print(An0_Val);
-    Serial.print("   |||   "); 
-    Serial.print(temp);    
+    temp0=int((An0_Val*127)/1023);
+    MIDI_TX(176,30+6*mode,temp0);
   }
+ /* if (!(An1_Val-4<analogRead(An1)) || !(analogRead(An1)<An1_Val +4))
+  {
+    An1_Val=analogRead(An1); 
+    temp1=int((An1_Val*127)/1023);
+    MIDI_TX(176,31+6*mode,temp1);
+  }
+  if (!(An2_Val-4<analogRead(An2)) || !(analogRead(An2)<An2_Val +4))
+  {
+    An2_Val=analogRead(An2); 
+    temp2=int((An2_Val*127)/1023);
+    MIDI_TX(176,32+6*mode,temp2);
+  }
+  if (!(An3_Val-4<analogRead(An3)) || !(analogRead(An3)<An3_Val +4))
+  {
+    An3_Val=analogRead(An3); 
+    temp3=int((An3_Val*127)/1023);
+    MIDI_TX(176,33+6*mode,temp3);
+  }  
+  if (!(An4_Val-4<analogRead(An4)) || !(analogRead(An4)<An4_Val +4))
+  {
+    An4_Val=analogRead(An4); 
+    temp4=int((An4_Val*127)/1023);
+    MIDI_TX(176,34+6*mode,temp4);
+  } 
+  if (!(An5_Val-4<analogRead(An5)) || !(analogRead(An5)<An5_Val +4))
+  {
+    An5_Val=analogRead(An5); 
+    temp5=int((An5_Val*127)/1023);
+    MIDI_TX(176,35+6*mode,temp5);
+  } */
 }
