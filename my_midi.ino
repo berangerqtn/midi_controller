@@ -1,10 +1,10 @@
 //Home made MIDI Controler, with Arduino UNO
 //Béranger Quintana
 
-//10 Control Change Buttons 
+//8 Control Change Buttons 
 //6 Slide Potentiometers 
 
-//2 MODES => 20 CC instructions and 12 Slides Pot actions 
+//3 MODES => 24 CC instructions and 18 Slides Pot actions 
 
 
 // MIDI (cccc = canal):
@@ -16,12 +16,10 @@
 // | 1011 cccc = control change => 176(10) | 0xxx xxxx: number | 0xxx xxxx: value    |
 // -----------------------------------------------------------------------------------
 
-//Used PINS
-
 // DIGITAL PINS
 
-int D0 = 0;    
-int D1 = 1;
+int D0 = 0; // WE CANNOT USE THE DIGITAL PIN 0 FOR THIS PROJECT BECAUSE WE ARE USING SERIAL COMMUNICATION (e.g. Serial Begin)  
+int D1 = 1; // WE CANNOT USE THE DIGITAL PIN 1 FOR THIS PROJECT BECAUSE WE ARE USING SERIAL COMMUNICATION (e.g. Serial Begin)
 int D2 = 2;
 int D3 = 3;
 int D4 = 4;
@@ -64,7 +62,7 @@ void setup()
   {
     pinMode(j,OUTPUT);
   }
-  Serial.begin(31250); //31250 FOR MIDI TRANSMITTING AND 9250 FOR SERIAL TESTS
+  Serial.begin(31250); //31250 FOR MIDI TRANSMITTING AND 9600 FOR SERIAL TESTS
   digitalWrite(DLED1,HIGH);
 }
 
@@ -76,9 +74,7 @@ void loop()
 {  
   MANAGE_MODE();
   MANAGE_DIGITALS();
-  // MANAGE_ANALOGS();
-  //Serial.print("\n\nMode actuel : ");
-  //Serial.print(mode);
+  MANAGE_ANALOGS(); 
 }
 
 
@@ -86,64 +82,54 @@ void loop()
 
 void MIDI_TX(unsigned char MESSAGE, unsigned char DONNEE1, unsigned char DONNEE2) 
 {
- Serial.write(MESSAGE); //envoi de l'octet de message sur le port série
- Serial.write(DONNEE1); //envoi de l'octet de donnée 1 sur le port série
- Serial.write(DONNEE2); //envoi de l'octet de donnée 2 sur le port série
+ Serial.write(MESSAGE); 
+ Serial.write(DONNEE1); 
+ Serial.write(DONNEE2); 
 }
 
 
-//FUNCTION : MANAGE_DIGITALS : Manage behaviour of digital Rising edge
+//FUNCTION : MANAGE_DIGITALS : Manage behaviour of digital Low edge
 void MANAGE_DIGITALS()
 {
-  if (digitalRead(D0)== LOW)                                                                                               
+ 
+  if (digitalRead(D2)== LOW)                                          
   {
-    MIDI_TX(176,0+10*mode,127);
-    delay(250);  
-  }
-    
-  else if (digitalRead(D1)== LOW)                                                                                               
-  {
-    MIDI_TX(176,1+10*mode,127);
-    delay(250);  
-  }
-  else if (digitalRead(D2)== LOW)                                          
-  {
-    MIDI_TX(176,2+10*mode,127);
+    MIDI_TX(176,0+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D3)== LOW)                                                                                               
   {
-    MIDI_TX(176,3+10*mode,127);
+    MIDI_TX(176,1+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D4)== LOW)                                                                                               
   {
-    MIDI_TX(176,4+10*mode,127);
+    MIDI_TX(176,2+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D5)== LOW)                                                                                               
   {
-    MIDI_TX(176,5+10*mode,127);
+    MIDI_TX(176,3+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D6)== LOW)                                                                                               
   {
-    MIDI_TX(176,6+10*mode,127);
+    MIDI_TX(176,4+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D7)== LOW)                                                                                               
   {
-    MIDI_TX(176,7+10*mode,127);
+    MIDI_TX(176,5+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D8)== LOW)                                                                                               
   {
-    MIDI_TX(176,8+10*mode,127);
+    MIDI_TX(176,6+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D9)== LOW)                                                                                               
   {
-    MIDI_TX(176,9+10*mode,127);
+    MIDI_TX(176,7+8*mode,127);
     delay(250);  
   }
 }
@@ -188,7 +174,7 @@ void MANAGE_ANALOGS()
     temp0=int((An0_Val*127)/1023);
     MIDI_TX(176,30+6*mode,temp0);
   }
- /* if (!(An1_Val-4<analogRead(An1)) || !(analogRead(An1)<An1_Val +4))
+  if (!(An1_Val-4<analogRead(An1)) || !(analogRead(An1)<An1_Val +4))
   {
     An1_Val=analogRead(An1); 
     temp1=int((An1_Val*127)/1023);
@@ -217,5 +203,5 @@ void MANAGE_ANALOGS()
     An5_Val=analogRead(An5); 
     temp5=int((An5_Val*127)/1023);
     MIDI_TX(176,35+6*mode,temp5);
-  } */
+  } 
 }
