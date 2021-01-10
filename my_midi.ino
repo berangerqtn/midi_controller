@@ -1,4 +1,5 @@
-//Home made MIDI Controler, with Arduino UNO
+//----------------------------------------------------
+//     Home made MIDI Controler, with Arduino UNO
 //Béranger Quintana
 
 //8 Control Change Buttons 
@@ -15,6 +16,10 @@
 // | 1110 cccc = pitch bend => 224(10)     | 0000 0000:  code  | 0xxx xxxx: speed    |
 // | 1011 cccc = control change => 176(10) | 0xxx xxxx: number | 0xxx xxxx: value    |
 // -----------------------------------------------------------------------------------
+
+
+//IMPORTANT : DO NOT START YOUR CC COMMUNICATION ON CC0 BECAUSE THE TX PIN FROM THE ARDUINO WILL INTERFERE
+
 
 // DIGITAL PINS
 
@@ -47,6 +52,7 @@ int An4 = 4;
 int An4_Val = 0;
 int An5 = 5;
 int An5_Val = 0;
+
 int mode = 0;
 
 //***************************************************
@@ -87,49 +93,48 @@ void MIDI_TX(unsigned char MESSAGE, unsigned char DONNEE1, unsigned char DONNEE2
  Serial.write(DONNEE2); 
 }
 
-
 //FUNCTION : MANAGE_DIGITALS : Manage behaviour of digital Low edge
 void MANAGE_DIGITALS()
 {
  
   if (digitalRead(D2)== LOW)                                          
   {
-    MIDI_TX(176,0+8*mode,127);
+    MIDI_TX(176,70+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D3)== LOW)                                                                                               
   {
-    MIDI_TX(176,1+8*mode,127);
+    MIDI_TX(176,71+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D4)== LOW)                                                                                               
   {
-    MIDI_TX(176,2+8*mode,127);
+    MIDI_TX(176,72+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D5)== LOW)                                                                                               
   {
-    MIDI_TX(176,3+8*mode,127);
+    MIDI_TX(176,73+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D6)== LOW)                                                                                               
   {
-    MIDI_TX(176,4+8*mode,127);
+    MIDI_TX(176,74+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D7)== LOW)                                                                                               
   {
-    MIDI_TX(176,5+8*mode,127);
+    MIDI_TX(176,75+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D8)== LOW)                                                                                               
   {
-    MIDI_TX(176,6+8*mode,127);
+    MIDI_TX(176,76+8*mode,127);
     delay(250);  
   }
   else if (digitalRead(D9)== LOW)                                                                                               
   {
-    MIDI_TX(176,7+8*mode,127);
+    MIDI_TX(176,77+8*mode,127);
     delay(250);  
   }
 }
@@ -160,48 +165,149 @@ void MANAGE_MODE()
   }
 }
 int temp0=0;
+int switch0=0;
 int temp1=0;
+int switch1=0;
 int temp2=0;
+int switch2=0;
 int temp3=0;
+int switch3=0;
 int temp4=0;
+int switch4=0;
 int temp5=0;
+int switch5=0;
 
 void MANAGE_ANALOGS()
 {
-  if (!(An0_Val-4<analogRead(An0)) || !(analogRead(An0)<An0_Val +4))
+  //ANALOG0
+  if (!(An0_Val-6*7<analogRead(An0)) || !(analogRead(An0)<An0_Val +6*7) && (switch0==0))
   {
+    switch0=1;
     An0_Val=analogRead(An0); 
     temp0=int((An0_Val*127)/1023);
-    MIDI_TX(176,30+6*mode,temp0);
+    MIDI_TX(176,100+6*mode,temp0);
   }
-  if (!(An1_Val-4<analogRead(An1)) || !(analogRead(An1)<An1_Val +4))
+  else if (!(An0_Val-6*7<analogRead(An0)) || !(analogRead(An0)<An0_Val +6*7) && (switch0==1))
   {
+    if ((!(An0_Val-8<analogRead(An0)) || !(analogRead(An0)<An0_Val+8)))
+    {
+        switch0=0;
+    }
+    else
+    {
+        An0_Val=analogRead(An0); 
+        temp0=int((An0_Val*127)/1023);
+        MIDI_TX(176,100+6*mode,temp0);
+    }
+  }
+  /*
+  //ANALOG1
+  if ((!(An1_Val-6*7<analogRead(An1)) || !(analogRead(An1)<An1_Val +6*7)) && (switch1==0))
+  {
+    switch1=1;
     An1_Val=analogRead(An1); 
     temp1=int((An1_Val*127)/1023);
-    MIDI_TX(176,31+6*mode,temp1);
+    MIDI_TX(176,101+6*mode,temp1);
   }
-  if (!(An2_Val-4<analogRead(An2)) || !(analogRead(An2)<An2_Val +4))
+  else if ((!(An1_Val-6*7<analogRead(An1)) || !(analogRead(An1)<An1_Val +6*7)) && (switch1==1))
   {
+    if ((!(An1_Val-8<analogRead(An1)) || !(analogRead(An1)<An1_Val+8)))
+    {
+        switch1=0;
+    }
+    else
+    {
+        An1_Val=analogRead(An1); 
+        temp1=int((An1_Val*127)/1023);
+        MIDI_TX(176,101+6*mode,temp1);
+    }
+  }
+
+  //ANALOG2
+  if ((!(An2_Val-6*7<analogRead(An2)) || !(analogRead(An2)<An2_Val +6*7)) && (switch2==0))
+  {
+    switch2=1;
     An2_Val=analogRead(An2); 
     temp2=int((An2_Val*127)/1023);
-    MIDI_TX(176,32+6*mode,temp2);
+    MIDI_TX(176,102+6*mode,temp2);
   }
-  if (!(An3_Val-4<analogRead(An3)) || !(analogRead(An3)<An3_Val +4))
+  else if ((!(An2_Val-6*7<analogRead(An2)) || !(analogRead(An2)<An2_Val +6*7)) && (switch2==1))
   {
+    if ((!(An2_Val-8<analogRead(An2)) || !(analogRead(An2)<An2_Val+8)))
+    {
+        switch2=0;
+    }
+    else
+    {
+        An2_Val=analogRead(An2); 
+        temp2=int((An2_Val*127)/1023);
+        MIDI_TX(176,102+6*mode,temp2);
+    }
+  }
+
+  //ANALOG3
+  if ((!(An3_Val-6*7<analogRead(An3)) || !(analogRead(An3)<An3_Val +6*7)) && (switch3==0))
+  {
+    switch3=1;
     An3_Val=analogRead(An3); 
     temp3=int((An3_Val*127)/1023);
-    MIDI_TX(176,33+6*mode,temp3);
-  }  
-  if (!(An4_Val-4<analogRead(An4)) || !(analogRead(An4)<An4_Val +4))
+    MIDI_TX(176,103+6*mode,temp3);
+  }
+  else if ((!(An3_Val-6*7<analogRead(An3)) || !(analogRead(An3)<An3_Val +6*7)) && (switch3==1))
   {
+    if ((!(An3_Val-8<analogRead(An3)) || !(analogRead(An3)<An3_Val+8)))
+    {
+        switch3=0;
+    }
+    else
+    {
+        An3_Val=analogRead(An3); 
+        temp3=int((An3_Val*127)/1023);
+        MIDI_TX(176,103+6*mode,temp3);
+    }
+  }
+
+  //ANALOG4
+  if ((!(An4_Val-6*7<analogRead(An4)) || !(analogRead(An4)<An4_Val +6*7)) && (switch4==0))
+  {
+    switch4=1;
     An4_Val=analogRead(An4); 
     temp4=int((An4_Val*127)/1023);
-    MIDI_TX(176,34+6*mode,temp4);
-  } 
-  if (!(An5_Val-4<analogRead(An5)) || !(analogRead(An5)<An5_Val +4))
+    MIDI_TX(176,104+6*mode,temp4);
+  }
+  else if ((!(An4_Val-6*7<analogRead(An4)) || !(analogRead(An4)<An4_Val +6*7)) && (switch4==1))
   {
+    if ((!(An4_Val-8<analogRead(An4)) || !(analogRead(An4)<An4_Val+8)))
+    {
+        switch4=0;
+    }
+    else
+    {
+        An4_Val=analogRead(An4); 
+        temp4=int((An4_Val*127)/1023);
+        MIDI_TX(176,104+6*mode,temp4);
+    }
+  }
+
+  //ANALOG5
+  if ((!(An5_Val-6*7<analogRead(An5)) || !(analogRead(An5)<An5_Val +6*7)) && (switch5==0))
+  {
+    switch5=1;
     An5_Val=analogRead(An5); 
     temp5=int((An5_Val*127)/1023);
-    MIDI_TX(176,35+6*mode,temp5);
-  } 
+    MIDI_TX(176,105+6*mode,temp5);
+  }
+  else if ((!(An5_Val-6*7<analogRead(An5)) || !(analogRead(An5)<An5_Val +6*7)) && (switch5==1))
+  {
+    if ((!(An5_Val-8<analogRead(An5)) || !(analogRead(An5)<An5_Val+8)))
+    {
+        switch5=0;
+    }
+    else
+    {
+        An5_Val=analogRead(An5); 
+        temp5=int((An5_Val*127)/1023);
+        MIDI_TX(176,105+6*mode,temp5);
+    }
+  }*/
 }
